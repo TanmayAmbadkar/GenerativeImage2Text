@@ -361,3 +361,5 @@ output/
 dataset
 lightning_logs
 checkpoints
+inference
+*/.ipynb_checkpoint
