@@ -47,7 +47,8 @@ def get_git_model(tokenizer, param):
         eos_index=tokenizer.sep_token_id,
         tokenizer=tokenizer,
         use_history_for_infer=True,
-        loss_type='smooth',
+        # loss_type='smooth',
+        loss_type='new',
         num_image_with_embedding=param.get('num_image_with_embedding')
     )
     return model

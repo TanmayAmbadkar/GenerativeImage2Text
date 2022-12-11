@@ -16,7 +16,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 
-class PoseImageCaptioningModel(pl.LightningModule):
+class TestImageCaptioningModel(pl.LightningModule):
     def __init__(self, model_name: str, tokenizer_name: str, learning_rate: float) -> None:
         super().__init__()
         # tokenizer
