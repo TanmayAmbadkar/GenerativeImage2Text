@@ -221,18 +221,7 @@ input with transformations and forward/backward. The code can be plugged into
 any trainer easily. Here is the example for the base model.
 - Pretraining/captioning
   ```
-  python -m generativeimage2text.train -p "{'type': 'forward_backward_example', \
-                  'image_files': ['aux_data/images/1.jpg', 'aux_data/images/2.jpg'], \
-                  'captions': ['a couple of boats in a large body of water.', 'a view of a mountain with a tree'], \
-              }"
-  ```
-- VQA
-  ```
-  python -m generativeimage2text.train -p "{'type': 'forward_backward_example', \
-                  'image_files': ['aux_data/images/1.jpg', 'aux_data/images/2.jpg'], \
-                  'prefixs': ['what is this?', 'how many trees?'], \
-                  'captions': ['several boats in a large body of water', '1'], \
-              }"
+  python trainer.py
   ```
 
 
