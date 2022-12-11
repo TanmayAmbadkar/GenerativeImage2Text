@@ -19,33 +19,6 @@ This repo presents some example codes to reproduce some results in
   python setup.py build develop
   ```
 
-# Inference
-- Inference on a single image or multiple frames:
-  ```shell
-  # single image, captioning
-  AZFUSE_TSV_USE_FUSE=1 python -m generativeimage2text.inference -p "{'type': 'test_git_inference_single_image', \
-        'image_path': 'aux_data/images/1.jpg', \
-        'model_name': 'GIT_BASE', \
-        'prefix': '', \
-  }"
-  # single image, question answering
-  AZFUSE_TSV_USE_FUSE=1 python -m generativeimage2text.inference -p "{'type': 'test_git_inference_single_image', \
-        'image_path': 'aux_data/images/1.jpg', \
-        'model_name': 'GIT_BASE_VQAv2', \
-        'prefix': 'what is it?', \
-  }"
-  # multiple images, captioning
-  AZFUSE_TSV_USE_FUSE=1 python -m generativeimage2text.inference -p "{'type': 'test_git_inference_single_image', \
-        'image_path': ['aux_data/images/1.jpg', 'aux_data/images/1.jpg', 'aux_data/images/1.jpg', 'aux_data/images/1.jpg', 'aux_data/images/1.jpg', 'aux_data/images/1.jpg'], \
-        'model_name': 'GIT_BASE_VATEX', \
-        'prefix': '', \
-  }"
-  # multiple images, question answering
-  AZFUSE_TSV_USE_FUSE=1 python -m generativeimage2text.inference -p "{'type': 'test_git_inference_single_image', \
-        'image_path': ['aux_data/images/1.jpg', 'aux_data/images/1.jpg', 'aux_data/images/1.jpg', 'aux_data/images/1.jpg', 'aux_data/images/1.jpg', 'aux_data/images/1.jpg'], \
-        'model_name': 'GIT_BASE_MSRVTT_QA', \
-        'prefix': 'what is it?', \
-  }"
   ```
   - If `prefix` is empty, it is effectively the captioning task.
   - If `prefix` is a question, it is effectively the visual question answering task.
@@ -145,108 +118,15 @@ This repo presents some example codes to reproduce some results in
                    && cat inference/GIT_BASE_COCO/coco.score.json \
                    "
        ```
-  - Inference on [vqa](https://visualqa.org/index.html) test
-    1. Inference
-       ```shell
-       # base model
-       AZFUSE_TSV_USE_FUSE=1 python -m generativeimage2text.inference -p "{'type': 'test_git_inference_single_tsv', \
-             'image_tsv': 'data/TaxVQAv2/test.tsv', \
-             'model_name': 'GIT_BASE_VQAv2', \
-             'question_tsv': 'data/TaxVQAv2/test.caption.tsv', \
-             'out_tsv': 'inference/GIT_BASE_VQAv2/snapshot/vqav2.tsv', \
-       }"
-       # GIT_LARGE_VQAv2 with 8 GPUs.
-       AZFUSE_TSV_USE_FUSE=1 mpirun -n 8 python -m generativeimage2text.inference -p "{'type': 'test_git_inference_single_tsv', \
-             'image_tsv': 'data/TaxVQAv2/test.tsv', \
-             'model_name': 'GIT_LARGE_VQAv2', \
-             'question_tsv': 'data/TaxVQAv2/test.caption.tsv', \
-             'out_tsv': 'inference/GIT_LARGE_VQAv2/snapshot/vqav2.tsv', \
-       }"
-       ```
-
-    2. Convert the output tsv to the json format for submission to [evalai](https://eval.ai/web/challenges/challenge-page/830/overview)
-       ```shell
-       # base model
-       AZFUSE_TSV_USE_FUSE=1 python -m generativeimage2text.inference -p "{'type': 'convert_tsv_to_vqa_json', \
-             'predict_file': 'inference/GIT_BASE_VQAv2/snapshot/vqav2.tsv', \
-             'out_json': 'inference/GIT_BASE_VQAv2/snapshot/vqav2.json', \
-       }"
-       # large model
-       AZFUSE_TSV_USE_FUSE=1 python -m generativeimage2text.inference -p "{'type': 'convert_tsv_to_vqa_json', \
-             'predict_file': 'inference/GIT_LARGE_VQAv2/snapshot/vqav2.tsv', \
-             'out_json': 'inference/GIT_LARGE_VQAv2/snapshot/vqav2.json', \
-       }"
-       ```
-       Submit the file of `inference/GIT_BASE_VQAv2/snapshot/vqav2.json` to evalai
-       and you should get `72.72` on `test-dev`. If it is `GIT_LARGE_VQAv2`, the accuracy is
-       `75.51`.
-
-    3. (optional) To exactly reproduce the number, you can use the
-       following:
-       ```shell
-       # base model
-       nvidia-docker run --ipc=host amsword/setup:py38pt19u20cu11 \
-           bash -c "mkdir /tmp/code \
-                   && cd /tmp/code \
-                   && pip install git+https://github.com/microsoft/azfuse.git \
-                   && git clone https://github.com/amsword/generativeimage2text.git \
-                   && cd generativeimage2text \
-                   && pip install -r requirements.txt \
-                   && python setup.py build develop \
-                   && AZFUSE_TSV_USE_FUSE=1 python -m generativeimage2text.inference -p "{'type': 'test_git_inference_single_tsv', \
-                       'image_tsv': 'data/TaxVQAv2/test.tsv', \
-                       'model_name': 'GIT_BASE_VQAv2', \
-                       'question_tsv': 'data/TaxVQAv2/test.caption.tsv', \
-                       'out_tsv': 'inference/GIT_BASE_VQAv2/snapshot/vqav2.tsv', \
-                   }" \
-                   &&  AZFUSE_TSV_USE_FUSE=1 python -m generativeimage2text.inference -p "{'type': 'convert_tsv_to_vqa_json', \
-                       'predict_file': 'inference/GIT_BASE_VQAv2/snapshot/vqav2.tsv', \
-                       'out_json': 'inference/GIT_BASE_VQAv2/snapshot/vqav2.json', \
-                   }" \
-       }"
-       ```
-       Note that, please modify the docker command properly so that the output
-       file can be saved permanently to the host machine. It is also recommended
-       to run it inside the docker container by
-       ```shell
-       nvidia-docker run --ipc=host amsword/setup:py38pt19u20cu11 sleep infinity
-       docker ps # get the docker container ID
-       docker exec -it container_id /bin/bash # attach inside the docker container
-       # all other commands to run the inference.
-       ```
-
+  
 # Training
 The repo shows the key code path of constructing the network
 input with transformations and forward/backward. The code can be plugged into
 any trainer easily. Here is the example for the base model.
 - Pretraining/captioning
   ```
-  python -m generativeimage2text.train -p "{'type': 'forward_backward_example', \
-                  'image_files': ['aux_data/images/1.jpg', 'aux_data/images/2.jpg'], \
-                  'captions': ['a couple of boats in a large body of water.', 'a view of a mountain with a tree'], \
-              }"
+  python trainer.py
   ```
-- VQA
-  ```
-  python -m generativeimage2text.train -p "{'type': 'forward_backward_example', \
-                  'image_files': ['aux_data/images/1.jpg', 'aux_data/images/2.jpg'], \
-                  'prefixs': ['what is this?', 'how many trees?'], \
-                  'captions': ['several boats in a large body of water', '1'], \
-              }"
-  ```
-
-
-# ImageNet
-## Class ID to unique readable names
-- Save the file of `LOC_synset_mapping.txt` from [Kaggle](https://www.kaggle.com/competitions/imagenet-object-localization-challenge/data?select=LOC_synset_mapping.txt).
-  under `aux_data/imagenet/`
-
-- Convert the wordnet ID to readable names as follows
-  ```python
-  python -m generativeimage2text.data_prepare -p "{'type': 'generate_imagenet_unique_names'}"
-  ```
-  The input file is hard coded as `./aux_data/imagenet/LOC_synset_mapping.txt` and the
-  output file is `./aux_data/imagenet/imagenet_unique_readable_names.txt`
 
 # Citation
 Please consider to cite the following reference if it helps.
