@@ -353,3 +353,11 @@ build/
 *.egg-info/
 output/
 
+
+
+
+## Extras
+
+dataset
+lightning_logs
+checkpoints
