@@ -2,6 +2,8 @@
 This repo presents some example codes to reproduce some results in
 [GIT: A Generative Image-to-text Transformer for Vision and Language](https://arxiv.org/abs/2205.14100).
 
+This has been adapted from the Original repo for GIT. - https://github.com/microsoft/GenerativeImage2Text
+
 # Installation
 - Install [azfuse](https://github.com/microsoft/azfuse). The tool is used to
   automatically download the data. The configuration of
@@ -9,7 +11,7 @@ This repo presents some example codes to reproduce some results in
 
 - Download the source code by
   ```shell
-  git clone https://github.com/microsoft/GenerativeImage2Text.git
+  git clone https://github.com/TanmayAmbadkar/GenerativeImage2Text.git
   cd GenerativeImage2Text
   ```
 
